@@ -25,12 +25,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/apna-pos.git"
+    "url": "https://github.com/saurav-sirsat/Apna-Pos.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/apna-pos/issues"
+    "url": "https://github.com/saurav-sirsat/Apna-Pos/issues"
   },
-  "homepage": "https://apna-pos.vercel.app",
+  "homepage": "https://github.com/saurav-sirsat/Apna-Pos#readme",
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
     "@radix-ui/react-accordion": "^1.2.11",

@@ -8,11 +8,11 @@
 		<version>3.5.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.zosh</groupId>
-	<artifactId>pos-system</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>pos-system</name>
-	<description>pos system for D Mart</description>
+	<groupId>com.apnapos</groupId>
+	<artifactId>apna-pos</artifactId>
+	<version>1.0.0</version>
+	<name>Apna POS</name>
+	<description>Modern Point of Sale System for retail businesses</description>
 	<url/>
 	<licenses>
 		<license/>
