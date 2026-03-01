@@ -1,0 +1,15 @@
+# Railway Configuration
+[build]
+builder = "heroku/buildpacks:20"
+
+[deploy]
+startCommand = "java -jar target/pos-backend-1.0.0.jar"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+
+[[services]]
+name = "pos-backend"
+
+[services.variables]
+PORT = "8080"
+SPRING_PROFILES_ACTIVE = "production"

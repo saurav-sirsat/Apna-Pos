@@ -1,0 +1,109 @@
+version: "3.8"
+
+services:
+  posdb:
+    image: mysql:8.0
+    container_name: posdb
+    restart: unless-stopped
+    ports:
+      - "3302:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: pos
+      MYSQL_USER: posuser
+      MYSQL_PASSWORD: pospassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      timeout: 10s
+      retries: 10
+      interval: 10s
+      start_period: 10s
+    networks:
+      - pos-network
+
+  pos-backend:
+    build: 
+      context: ./pos-backend
+      dockerfile: Dockerfile
+    container_name: pos-backend
+    restart: unless-stopped
+    depends_on:
+      posdb:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: posdb
+      DB_PORT: 3306
+      DB_NAME: pos
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      RAZORPAY_API_KEY: ${RAZORPAY_API_KEY}
+      RAZORPAY_API_SECRET: ${RAZORPAY_API_SECRET}
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      APP_FRONTEND_RESET_URL: http://localhost/auth/reset-password?token=
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - pos-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  pos-frontend:
+    build: 
+      context: ./pos-frontend-vite
+      dockerfile: Dockerfile
+    container_name: pos-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      pos-backend:
+        condition: service_healthy
+    networks:
+      - pos-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis for caching and session management (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: pos-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - pos-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  pos-network:
+    driver: bridge
